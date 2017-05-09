@@ -35,3 +35,4 @@ Interested in contributing? All of the following are outstanding:
 - [] Note in README about build process and lack of support for grammar injection in
   Sublime+VSCode
 - [] Note in README about how to extend Glimmer patterns
+- [] Use beta repo for pulling in TypeScript defs? https://marketplace.visualstudio.com/items?itemName=ms-vscode.typescript-javascript-grammar
