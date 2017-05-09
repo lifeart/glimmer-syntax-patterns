@@ -1,0 +1,23 @@
+{
+  "name": "glimmer-syntax-patterns",
+  "version": "1.0.0",
+  "description": "Glimmer language definition files",
+  "main": "build.js",
+  "scripts": {
+    "build": "node build.js"
+  },
+  "keywords": [
+    "Glimmer",
+    "Syntax",
+    "Highlighting",
+    "Ember",
+    "HTMLBars"
+  ],
+  "author": "Dan Hedgecock <hedgecock.d@gmail.com> (danhedgecock.com)",
+  "license": "MIT",
+  "devDependencies": {
+    "eslint-config-healthsparq": "^1.0.0",
+    "language-babel": "git+https://github.com/gandm/language-babel.git",
+    "plist": "^2.1.0"
+  }
+}
