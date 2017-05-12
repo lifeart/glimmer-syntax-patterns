@@ -17,7 +17,6 @@
   "license": "MIT",
   "devDependencies": {
     "eslint-config-healthsparq": "^1.0.0",
-    "language-babel": "git+https://github.com/gandm/language-babel.git#2.60.0",
     "plist": "^2.1.0"
   }
 }

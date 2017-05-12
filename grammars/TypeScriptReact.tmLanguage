@@ -1276,7 +1276,7 @@
             <key>comment</key>
             <string>(default|*|name) as alias</string>
             <key>match</key>
-            <string>(?x) (?: \b(default)\b | (\*) | ([_$[:alpha:]][_$[:alnum:]]*)) \s+ 
+            <string>(?x) (?: \b(default)\b | (\*) | ([_$[:alpha:]][_$[:alnum:]]*)) \s+
   (as) \s+ (?: (\b default \b | \*) | ([_$[:alpha:]][_$[:alnum:]]*))</string>
             <key>captures</key>
             <dict>
@@ -2932,7 +2932,7 @@
             <string>(?x)(
   (?=
     [(]\s*(
-      ([)]) | 
+      ([)]) |
       (\.\.\.) |
       ([_$[:alnum:]]+\s*(
         ([:,?=])|
@@ -3500,7 +3500,7 @@
           <dict>
             <key>match</key>
             <string>(?x) (\.) \s* (?:
-  (constructor|length|prototype|__proto__) 
+  (constructor|length|prototype|__proto__)
   |
   (EPSILON|MAX_SAFE_INTEGER|MAX_VALUE|MIN_SAFE_INTEGER|MIN_VALUE|NEGATIVE_INFINITY|POSITIVE_INFINITY))\b(?!\$)</string>
             <key>captures</key>
@@ -3525,7 +3525,7 @@
           <dict>
             <key>match</key>
             <string>(?x) (?&lt;!\.|\$) \b (?:
-  (document|event|navigator|performance|screen|window) 
+  (document|event|navigator|performance|screen|window)
   |
   (AnalyserNode|ArrayBufferView|Attr|AudioBuffer|AudioBufferSourceNode|AudioContext|AudioDestinationNode|AudioListener
   |AudioNode|AudioParam|BatteryManager|BeforeUnloadEvent|BiquadFilterNode|Blob|BufferSource|ByteString|CSS|CSSConditionRule
@@ -3726,7 +3726,7 @@
           </dict>
           <dict>
             <key>match</key>
-            <string>(?x) (\.) \s* 
+            <string>(?x) (\.) \s*
 (?:
  (on(?:Rowsinserted|Rowsdelete|Rowenter|Rowexit|Resize|Resizestart|Resizeend|Reset|
    Readystatechange|Mouseout|Mouseover|Mousedown|Mouseup|Mousemove|
@@ -4519,7 +4519,7 @@
       )
     ) |
     (
-      [&lt;]\s*[_$[:alpha:]][_$[:alnum:]]*\s+extends\s*[^=&gt;] # &lt; typeparam extends 
+      [&lt;]\s*[_$[:alpha:]][_$[:alnum:]]*\s+extends\s*[^=&gt;] # &lt; typeparam extends
     ) |
     # arrow function possible to detect only with =&gt; on same line
     (
