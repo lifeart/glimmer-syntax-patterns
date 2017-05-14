@@ -31,3 +31,10 @@ Interested in contributing? All of the following are outstanding:
 - [] Note in README about build process and lack of support for grammar injection in
   Sublime+VSCode
 - [] Note in README about how to extend Glimmer patterns
+
+#### Syntax Updates:
+
+- [] Add separator (equal sign) for handlebars expressions eg name=value
+- Add special flag for ! and ? inside jsdoc types for null, not null eg: {!number}
+- Add a line-start+asterisk+whitespace pattern to source.handlebars for highlighting
+  handlebars inside of jsdoc markdown fenced code blocks
