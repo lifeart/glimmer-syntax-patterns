@@ -1,6 +1,6 @@
 {
   "name": "glimmer-syntax-patterns",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Glimmer language definition files",
   "main": "build.js",
   "scripts": {
