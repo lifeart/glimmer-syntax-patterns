@@ -15,7 +15,7 @@
     { "include": "#entities" }
 	],
 	"repository": {
-		"string-double-quoted": {
+		"string-double-quoted-handlebars": {
 			"name": "string.quoted.double.handlebars",
 			"begin": "\"",
 			"beginCaptures": {
@@ -32,7 +32,7 @@
 				}
 			]
 		},
-		"string-single-quoted": {
+		"string-single-quoted-handlebars": {
 			"name": "string.quoted.single.handlebars",
 			"begin": "'",
 			"beginCaptures": {
@@ -47,6 +47,42 @@
 					"name": "constant.character.escape.handlebars",
 					"match": "\\\\'"
 				}
+			]
+		},
+    "string-double-quoted-html": {
+			"name": "string.quoted.double.html.handlebars",
+			"begin": "\"",
+			"beginCaptures": {
+				"0": { "name": "punctuation.definition.string.begin.handlebars" }
+			},
+			"end": "\"",
+			"endCaptures": {
+				"0": { "name": "punctuation.definition.string.end.handlebars" }
+			},
+			"patterns": [
+				{
+					"name": "constant.character.escape.handlebars",
+					"match": "\\\\\""
+				},
+        { "include": "#glimmer-expression" }
+			]
+		},
+		"string-single-quoted-html": {
+			"name": "string.quoted.single.html.handlebars",
+			"begin": "'",
+			"beginCaptures": {
+				"0": { "name": "punctuation.definition.string.begin.handlebars" }
+			},
+			"end": "'",
+			"endCaptures": {
+				"0": { "name": "punctuation.definition.string.end.handlebars" }
+			},
+			"patterns": [
+				{
+					"name": "constant.character.escape.handlebars",
+					"match": "\\\\'"
+				},
+        { "include": "#glimmer-expression" }
 			]
 		},
 		"boolean": {
@@ -71,6 +107,8 @@
         "0": { "name": "punctuation.definition.block.unescaped.handlebars" }
       },
       "patterns": [
+        { "include": "#string-single-quoted-handlebars" },
+        { "include": "#string-double-quoted-handlebars" },
         { "include": "#glimmer-subexp" }
       ]
 		},
@@ -108,8 +146,8 @@
         { "include": "#as-keyword" },
         { "include": "#as-params" },
         { "include": "#glimmer-subexp" },
-				{ "include": "#string-single-quoted" },
-        { "include": "#string-double-quoted" },
+				{ "include": "#string-single-quoted-handlebars" },
+        { "include": "#string-double-quoted-handlebars" },
 				{ "include": "#boolean" },
 				{ "include": "#glimmer-parameter-name" },
 				{ "include": "#glimmer-parameter-value" }
@@ -126,8 +164,8 @@
       },
       "patterns": [
         { "include": "#glimmer-subexp" },
-				{ "include": "#string-single-quoted" },
-        { "include": "#string-double-quoted" },
+				{ "include": "#string-single-quoted-handlebars" },
+        { "include": "#string-double-quoted-handlebars" },
 				{ "include": "#boolean" },
 				{ "include": "#glimmer-parameter-name" },
 				{ "include": "#glimmer-parameter-value" }
@@ -214,8 +252,8 @@
         { "include": "#glimmer-comment-block" },
         { "include": "#glimmer-comment-inline" },
         { "include": "#glimmer-expression" },
-				{ "include": "#string-double-quoted" },
-        { "include": "#string-single-quoted" },
+				{ "include": "#string-double-quoted-html" },
+        { "include": "#string-single-quoted-html" },
         { "include": "#html-attribute" },
 				{ "include": "#boolean" }
       ]
