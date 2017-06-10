@@ -1,80 +1,90 @@
 'use strict';
-const plist = require('plist');
+const yaml = require('js-yaml');
 const { readFileSync, writeFile } = require('fs');
 
-const glimmerPatterns = require('./grammars/glimmer.tmLanguage.json');
-const markdownPatterns = require('./grammars/markdown.tmLanguage.json');
-const generalPatterns = require('./grammars/general.json');
-let typeScriptBase = readFileSync('./grammars/TypeScriptReact.tmLanguage', 'utf-8');
+const typeScriptSyntax = require('./grammars/TypeScriptReact.tmLanguage.json');
+const glimmerSyntax = yaml.safeLoad(readFileSync('./grammars/glimmer.tmLanguage.json', 'utf-8'));
+const docblockMarkdownSyntax = yaml.safeLoad(readFileSync('./grammars/markdown.tmLanguage.json', 'utf-8'));
+const generalPatterns = yaml.safeLoad(readFileSync('./grammars/general.json', 'utf-8'));
 
-// Function to traverse grammars and change scopes to the passed target.
-function fixGrammarScopeNames(rule, target) {
-  if (typeof rule.name === 'string') {
-    rule.name = target === 'ts' ?
-      rule.name.replace(/\.tsx/g, '.ts')
-      : rule.name.replace(/\.ts/g, '.js');
+/**
+ * Reursively changes the scopeName for all entries in a syntax
+ * @param {Object}       pattern Syntax pattern to update, will be recursed
+ * @param {regex|string} current Current scopeName to target
+ * @param {string}       target  New scopeName to update to
+ */
+function changeGrammarScopeNames(pattern, current, target) {
+  if (pattern.name) {
+    pattern.name = pattern.name.replace(current, target);
+  }
+  if (pattern.contentName) {
+    pattern.contentName = pattern.contentName.replace(current, target);
   }
 
-  if (typeof rule.contentName === 'string') {
-    rule.contentName = target === 'ts' ?
-      rule.contentName.replace(/\.tsx/g, '.ts')
-      : rule.contentName.replace(/\.ts/g, '.js');
-  }
   // recurse
-  for (let property in rule) {
-    let value = rule[property];
+  for (let property in pattern) {
+    let value = pattern[property];
     if (typeof value === 'object') {
-      fixGrammarScopeNames(value, target);
+      changeGrammarScopeNames(value, current, target);
     }
   }
 }
 
-// The tagged template pattern definition used to match 'hbs``' inside of JS/TS files
-const glimmerTaggedTemplatePattern = {
-  name: 'meta.source.handlebars.ts',
-  begin: '\\s?(hbs)((`))', // Optional whitespace required for Babel to match pattern
-  end: '((`))',
-  beginCaptures: {
-    '1': { name: 'entity.name.tag.ts' },
-    '2': { name: 'markup.template.definition.begin.handlebars.ts' },
-    '3': { name: 'string.template.tagged.ts' }
-  },
-  endCaptures: {
-    '1': { name: 'markup.template.definition.end.handlebars.ts' },
-    '2': { name: 'string.template.tagged.ts' }
-  },
-  patterns: [
-    { include: 'source.handlebars' }
-  ]
-};
+/**
+ * Writes a finished syntax data structure to /dist
+ * @param {string} file
+ * @param {Object} data
+ */
+function writeToDist(file, data) {
+  writeFile(
+    `dist/${file}`,
+    JSON.stringify(data, null, 2),
+    err => {
+      if (err) { return console.warn(err); }
+      console.log(`${file} build complete`);
+    }
+  );
+}
 
 // Handlebars Syntax
 // ---------------------------------------------------------------------------
 
 // The Handlebars syntax is complete as is, Write to /dist
-writeFile('dist/Glimmer.tmLanguage.json', JSON.stringify(glimmerPatterns, null, 2), err => {
-  if (err) { return console.warn(err); }
-  console.log('Glimmer build complete');
-});
+writeToDist('Glimmer.tmLanguage.json', glimmerSyntax);
 
 // TypeScript Syntax
 // ---------------------------------------------------------------------------
 
-// Rename TSX specific values to package TS (Extended)
-typeScriptBase = plist.parse(typeScriptBase); // Convert to JSON
-delete typeScriptBase.uuid; // TODO: make new uuids
-typeScriptBase.name = 'TypeScript (Extended)';
-typeScriptBase.scopeName = 'source.ts';
-typeScriptBase.fileTypes = ['ts'];
+// Change syntax meta info for our 'TS (Extended)' language
+delete typeScriptSyntax.uuid; // TODO: make new uuids
+typeScriptSyntax.name = 'TypeScript (Extended)';
+typeScriptSyntax.scopeName = 'source.ts';
+typeScriptSyntax.fileTypes = ['ts', 'tsx'];
 
-// Inject Handlebars tagged template pattern
-typeScriptBase.repository['glimmer-tagged-template'] = glimmerTaggedTemplatePattern;
-typeScriptBase.repository.expression.patterns.unshift({ include: '#glimmer-tagged-template' });
+// Change identifiers from .tsx => .ts
+typeScriptSyntax.patterns.forEach(pattern => changeGrammarScopeNames(pattern, /tsx/g, 'ts'));
+for (let key in typeScriptSyntax.repository) {
+  changeGrammarScopeNames(typeScriptSyntax.repository[key], /tsx/g, 'ts');
+}
 
-// Inject Markdown in Docblock patterns to #comment.patterns[]
-Object.assign(typeScriptBase.repository, markdownPatterns.repository);
-// Docblock patterns are first entry in #comment.patterns
-typeScriptBase.repository.comment.patterns[0].patterns = [
+// Merge Markdown in DocBlock and General purpose patterns into TypeScript base
+// repository to make them available in the syntax
+Object.assign(
+  typeScriptSyntax.repository,
+  docblockMarkdownSyntax.repository,
+  generalPatterns.repository
+);
+
+// Inject include calls into appropriate `patterns` arrays to trigger matches on our
+// merged patterns for inline templates and DocBlock markdown
+
+// Ember inline tagged template pattern into the `expression` pattern entry
+// (as the first pattern this will match first in all expressions)
+typeScriptSyntax.repository.expression.patterns.unshift({ include: '#glimmer-tagged-template' });
+
+// Markdown in Docblock patterns to #comment.patterns[]
+// DocBlock patterns are first entry in #comment.patterns
+typeScriptSyntax.repository.comment.patterns[0].patterns = [
   { include: '#handlebars-fenced-code-block' },
   { include: '#fenced-code-block' },
   { include: '#inline-code-block' },
@@ -83,44 +93,29 @@ typeScriptBase.repository.comment.patterns[0].patterns = [
   { include: '#custom-tags' }
 ];
 
-// Inject General Patterns, currently includes attention highlighting keywords
-// pattern matches
-Object.assign(typeScriptBase.repository, generalPatterns.repository);
-
 // Add the #attention include to each comment pattern to highlight keywords like TODO
 // inside of comments
-typeScriptBase.repository.comment.patterns.forEach(pattern => {
+typeScriptSyntax.repository.comment.patterns.forEach(pattern => {
   if (!pattern.patterns) { pattern.patterns = []; }
   pattern.patterns.unshift({ include: '#attention' });
 });
 
-// Fix tsx => ts
-typeScriptBase.patterns.forEach(pattern => fixGrammarScopeNames(pattern, 'ts'));
-
-for (let key in typeScriptBase.repository) {
-  fixGrammarScopeNames(typeScriptBase.repository[key], 'ts');
-}
-
-writeFile('dist/TypeScriptExtended.tmLanguage.json', JSON.stringify(typeScriptBase, null, 2), err => {
-  if (err) { return console.warn(err); }
-  console.log('TS build complete');
-});
+// TypeScript base is now extended with new patterns and existing patterns are
+//decorated to match our extended patterns, write to /dist
+writeToDist('TypeScriptExtended.tmLanguage.json', typeScriptSyntax);
 
 // JavaScript Syntax
 // ---------------------------------------------------------------------------
 
-// Rename TS specific values to JS
-typeScriptBase.name = 'JavaScript (Extended)';
-typeScriptBase.scopeName = 'source.js';
-typeScriptBase.fileTypes = ['js', 'jsx'];
+// Change syntax meta info for our 'JS (Extended)' language
+typeScriptSyntax.name = 'JavaScript (Extended)';
+typeScriptSyntax.scopeName = 'source.js';
+typeScriptSyntax.fileTypes = ['js', 'jsx'];
 
-// Change ts => js
-typeScriptBase.patterns.forEach(pattern => fixGrammarScopeNames(pattern, 'js'));
-for (let key in typeScriptBase.repository) {
-  fixGrammarScopeNames(typeScriptBase.repository[key], 'js');
+// Change identifiers from ts => js
+typeScriptSyntax.patterns.forEach(pattern => changeGrammarScopeNames(pattern, /ts/g, 'js'));
+for (let key in typeScriptSyntax.repository) {
+  changeGrammarScopeNames(typeScriptSyntax.repository[key], /ts/g, 'js');
 }
 
-writeFile('dist/JavaScriptExtended.tmLanguage.json', JSON.stringify(typeScriptBase, null, 2), err => {
-  if (err) { return console.warn(err); }
-  console.log('JS build complete');
-});
+writeToDist('JavaScriptExtended.tmLanguage.json', typeScriptSyntax);

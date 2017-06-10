@@ -17,6 +17,6 @@
   "license": "MIT",
   "devDependencies": {
     "eslint-config-healthsparq": "^1.0.0",
-    "plist": "^2.1.0"
+    "js-yaml": "^3.8.4"
   }
 }

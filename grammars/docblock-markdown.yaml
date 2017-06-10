@@ -1,0 +1,53 @@
+$schema: https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json
+name: Markdown in DocBlocks
+scopeName: source.markdown.docblock
+patterns: []
+repository:
+  # Fenced code block for handlebars content
+  handlebars-fenced-code-block:
+    name: markup.fenced_code.block.markdown.jsdoc
+    begin: '([`~]{3,})(handlebars|htmlbars|glimmer)'
+    beginCaptures:
+      1: { name: punctuation.definition.markdown.jsdoc }
+      2: { name: fenced_code.block.language }
+    end: '(\1)'
+    endCaptures:
+      0: { name: punctuation.definition.markdown.jsdoc }
+    patterns:
+      - { include: '#docblock-punctuation' }
+      - { include: source.handlebars }
+  fenced-code-block:
+    name: markup.fenced_code.block.markdown.jsdoc
+    begin: '([`~]{3,})'
+    beginCaptures:
+      0: { name: punctuation.definition.markdown.jsdoc }
+    end: '(\1)'
+    endCaptures:
+      0: { name: punctuation.definition.markdown.jsdoc }
+    patterns:
+      - { include: '#docblock-punctuation' }
+  # Matches inline code, eg: `inline-code`
+  inline-code-block:
+    name: markup.inline.raw.markdown.jsdoc
+    begin: '`'
+    beginCaptures:
+      0: { name: punctuation.definition.raw.markdown.jsdoc }
+    end: '`'
+    endCaptures:
+      0: { name: punctuation.definition.raw.markdown.jsdoc }
+    patterns:
+      - { include: '#docblock-punctuation' }
+  # Main syntax matches most tags, but this will highlight any non-JSDoc tags and
+  # flag them as custom
+  custom-tags:
+    name: storage.custom.class.jsdoc
+    match: '(@)\S*'
+    captures:
+      1: { name: punctuation.definition.block.tag.jsdoc }
+    patterns: []
+  # Matches the '*' fencing all docblock content. This is used in multiline matches
+  # like the inline code block so the asterisk remains gray
+  docblock-punctuation:
+    name: comment.block.documentation.js
+    match: '^\s*\*'
+    patterns: []
