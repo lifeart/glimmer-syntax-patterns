@@ -3,9 +3,9 @@ const yaml = require('js-yaml');
 const { readFileSync, writeFile } = require('fs');
 
 const typeScriptSyntax = require('./grammars/TypeScriptReact.tmLanguage.json');
-const glimmerSyntax = yaml.safeLoad(readFileSync('./grammars/glimmer.tmLanguage.json', 'utf-8'));
-const docblockMarkdownSyntax = yaml.safeLoad(readFileSync('./grammars/markdown.tmLanguage.json', 'utf-8'));
-const generalPatterns = yaml.safeLoad(readFileSync('./grammars/general.json', 'utf-8'));
+const glimmerSyntax = yaml.safeLoad(readFileSync('./grammars/glimmer.yaml', 'utf-8'));
+const docblockMarkdownSyntax = yaml.safeLoad(readFileSync('./grammars/docblock-markdown.yaml', 'utf-8'));
+const generalPatterns = yaml.safeLoad(readFileSync('./grammars/general.yaml', 'utf-8'));
 
 /**
  * Reursively changes the scopeName for all entries in a syntax

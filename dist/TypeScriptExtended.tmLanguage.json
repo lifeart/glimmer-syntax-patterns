@@ -4264,7 +4264,7 @@
     },
     "handlebars-fenced-code-block": {
       "name": "markup.fenced_code.block.markdown.jsdoc",
-      "begin": "([`~]{3,})(handlebars|glimmer)",
+      "begin": "([`~]{3,})(handlebars|htmlbars|glimmer)",
       "beginCaptures": {
         "1": {
           "name": "punctuation.definition.markdown.jsdoc"
@@ -4345,7 +4345,37 @@
     },
     "attention": {
       "name": "storage.type.class.${1:/downcase}",
-      "match": "@?(TODO|FIXME|CHANGED|XXX|IDEA|HACK|NOTE|REVIEW|NB|BUG|QUESTION|TEMP)\\b"
+      "match": "@?(TODO|FIXME|CHANGED|XXX|IDEA|HACK|NOTE|REVIEW|NB|BUG|QUESTION|TEMP)\\\\b",
+      "patterns": []
+    },
+    "glimmer-tagged-template": {
+      "name": "meta.source.handlebars.ts",
+      "begin": "\\s?(hbs)((`))",
+      "beginCaptures": {
+        "1": {
+          "name": "entity.name.tag.ts"
+        },
+        "2": {
+          "name": "markup.template.definition.begin.handlebars.ts"
+        },
+        "3": {
+          "name": "string.template.tagged.ts"
+        }
+      },
+      "end": "((`))",
+      "endCaptures": {
+        "1": {
+          "name": "markup.template.definition.end.handlebars.ts"
+        },
+        "2": {
+          "name": "string.template.tagged.ts"
+        }
+      },
+      "patterns": [
+        {
+          "include": "source.handlebars"
+        }
+      ]
     }
   }
 }
