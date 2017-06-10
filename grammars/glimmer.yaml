@@ -1,197 +1,227 @@
 $schema: https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json
 scopeName: source.handlebars
 name: Glimmer
+fileTypes:
+- hbs
 patterns:
-  - include: '#glimmer-unescaped-expression'
-  - include: '#glimmer-comment-block'
-  - include: '#glimmer-comment-inline'
-  - include: '#glimmer-expression'
-  - include: '#html-tag'
-  - include: '#html-comment'
-  - include: '#entities'
+- include: '#glimmer-unescaped-expression'
+- include: '#glimmer-comment-block'
+- include: '#glimmer-comment-inline'
+- include: '#glimmer-expression'
+- include: '#html-tag'
+- include: '#html-comment'
+- include: '#entities'
 repository:
-    string-double-quoted:
-      name: string.quoted.double.handlebars
-      begin: '"'
-      beginCaptures:
-        0: { name: punctuation.definition.string.begin.handlebars }
-      end: '"'
-      endCaptures:
-        0: { name: punctuation.definition.string.end.handlebars }
-      patterns:
-        - name: constant.character.escape.handlebars
-          match: '\\"'
-    string-single-quoted:
-      name: string.quoted.single.handlebars
-      begin: "'"
-      beginCaptures:
-        0: { name: punctuation.definition.string.begin.handlebars }
-      end: "'"
-      endCaptures:
-        0: { name: punctuation.definition.string.end.handlebars }
-      patterns:
-        - name: constant.character.escape.handlebars
-          match: "\\\\'"
-    # matches booleans in assignments, eg; true
-    boolean:
-      match: true|false
+  string-double-quoted-handlebars:
+    name: string.quoted.double.handlebars
+    begin: '"'
+    beginCaptures:
+      0: { name: punctuation.definition.string.begin.handlebars }
+    end: '"'
+    endCaptures:
+      0: { name: punctuation.definition.string.end.handlebars }
+    patterns:
+    - name: constant.character.escape.handlebars
+      match: '\\"'
+  string-single-quoted-handlebars:
+    name: string.quoted.single.handlebars
+    begin: "'"
+    beginCaptures:
+      0: { name: punctuation.definition.string.begin.handlebars }
+    end: "'"
+    endCaptures:
+      0: { name: punctuation.definition.string.end.handlebars }
+    patterns:
+    - name: constant.character.escape.handlebars
+      match: "\\\\'"
+  string-double-quoted-html:
+    name: string.quoted.double.html.handlebars
+    begin: '"'
+    beginCaptures:
+      0: { name: punctuation.definition.string.begin.handlebars }
+    end: '"'
+    endCaptures:
+      0: { name: punctuation.definition.string.end.handlebars }
+    patterns:
+    - name: constant.character.escape.handlebars
+      match: '\\"'
+    - include: '#glimmer-expression'
+  string-single-quoted-html:
+    name: string.quoted.single.html.handlebars
+    begin: "'"
+    beginCaptures:
+      '0':
+        name: punctuation.definition.string.begin.handlebars
+    end: "'"
+    endCaptures:
+      '0':
+        name: punctuation.definition.string.end.handlebars
+    patterns:
+    - name: constant.character.escape.handlebars
+      match: "\\\\'"
+    - include: "#glimmer-expression"
+  # matches booleans in assignments, eg; true
+  boolean:
+    match: true|false
+    captures:
+      0: { name: constant.language.handlebars }
+    patterns: []
+  # matches attention keywords, used in comments
+  attention:
+    name: storage.type.class.${1:/downcase}
+    match: '@?(TODO|FIXME|CHANGED|XXX|IDEA|HACK|NOTE|REVIEW|NB|BUG|QUESTION|TEMP)\b'
+    patterns: []
+  #
+  # Handlebars/Glimmer Patterns
+  #
+  # Capture unescaped triple curlies
+  glimmer-unescaped-expression:
+    name: entity.unescaped.expression.handlebars
+    begin: '{{{'
+    end: '}}}'
+    captures:
+      0: { name: punctuation.definition.block.unescaped.handlebars }
+    patterns:
+    - include: '#string-single-quoted-handlebars'
+    - include: '#string-double-quoted-handlebars'
+    - include: '#glimmer-subexp'
+  glimmer-comment-block:
+    name: comment.block.glimmer
+    begin: '{{!--'
+    end: '--}}'
+    captures:
+      0: { name: punctuation.definition.block.comment.glimmer }
+    patterns:
+      - include: '#attention'
+  glimmer-comment-inline:
+    name: comment.inline.glimmer
+    begin: '{{!'
+    end: '}}'
+    captures:
+      0: { name: punctuation.definition.block.comment.glimmer }
+    patterns:
+      - include: '#attention'
+  glimmer-expression:
+    name: entity.expression.handlebars
+    begin: '({{)(#)*(/)*(?:(if|unless|with|each-in|each|else if|else|eq|not-eq|and|or|xor|gt|gte|link-to|lt|lte|is-array|is-equal|action|component|concat|debugger|get|hash|loc|log|mount|mut|outlet|partial|query-params|render|unbound)(?!-)\b|([a-zA-Z0-9_/.-]+))'
+    end: '(}})'
+    captures:
+      1: { name: punctuation.definition.expression.handlebars }
+      2: { name: punctuation.definition.expression.handlebars }
+      3: { name: punctuation.definition.expression.handlebars }
+      4: { name: support.function.builtin }
+      5: { name: entity.name.function.expression.handlebars }
+    patterns:
+    - include: '#as-keyword'
+    - include: '#as-params'
+    - include: '#glimmer-subexp'
+    - include: '#string-single-quoted-handlebars'
+    - include: '#string-double-quoted-handlebars'
+    - include: '#boolean'
+    - include: '#glimmer-parameter-name'
+    - include: '#glimmer-parameter-value'
+  # matches any subexpressions within glimmer expressions:
+  # {{something someValue=(helper someProp)}}
+  glimmer-subexp:
+    name: entity.subexpression.handlebars
+    begin: '(\()([a-zA-Z0-9.-]+)'
+    end: '(\))'
+    captures:
+      1: { name: punctuation.definition.subexpression.handlebars }
+      2: { name: support.function.name.subexpression.handlebars }
+    patterns:
+    - include: '#glimmer-subexp'
+    - include: '#string-single-quoted-handlebars'
+    - include: '#string-double-quoted-handlebars'
+    - include: '#boolean'
+    - include: '#glimmer-parameter-name'
+    - include: '#glimmer-parameter-value'
+  # matches the 'as' when creating params: as |someParam|
+  as-keyword:
+    name: support.function.builtin.handlebars
+    match: '\s\b(as)\b(?=\s\|)'
+    patterns: []
+  # Matches the params inside pipes: as |someParam|
+  as-params:
+    name: keyword.block-params.handlebars
+    begin: '(?<!\|)(\|)'
+    beginCaptures:
+      1: { name: constant.other.symbol.begin.handlebars }
+    end: '(\|)(?!\|)'
+    endCaptures:
+      1: { name: constant.other.symbol.end.handlebars }
+    patterns:
+    - include: '#variable'
+  # The value in a handlebars assignment eg: name=VALUE
+  glimmer-parameter-value:
+    match: '\b([a-zA-Z0-9:_.-]+)\b(?!=)'
+    captures:
+      1: { name: variable.parameter.value.handlebars }
+    patterns: []
+  # The name in a handlebars assignment, eg: NAME=value
+  glimmer-parameter-name:
+    match: '\b([a-zA-Z0-9:_.-]+)(=)'
+    captures:
+      1: { name: variable.parameter.name.handlebars }
+      2: { name: punctuation.definition.expression.handlebars }
+    patterns: []
+  variable:
+    name: variable.other.handlebars
+    match: '\b([a-zA-Z0-9-_]+)\b'
+    patterns: []
+  #
+  # HTML Patterns
+  #
+  # match on any html comment block eg: <!-- -->
+  html-comment:
+    name: comment.block.html.handlebars
+    begin: '<!--'
+    end: '--\s*>'
+    captures:
+      0: { name: punctuation.definition.comment.html.handlebars }
+    patterns:
+      - include: '#attention'
+      - match: --
+        name: invalid.illegal.bad-comments-or-CDATA.html.handlebars
+  # match any html tag, handle as separate matches on open/close tags
+  html-tag:
+    name: meta.tag.any.handlebars
+    begin: '(<\/?)(([a-zA-Z0-9:-]+))\b'
+    beginCaptures:
+      1: { name: punctuation.definition.tag.html.handlebars }
+      2: { name: entity.name.tag.html.handlebars }
+    end: '(\/?)(>)'
+    endCaptures:
+      1: { name: punctuation.definition.tag.html.handlebars }
+      2: { name: punctuation.definition.tag.html.handlebars }
+    # The order of includes is IMPORTANT. By including strings BEFORE attributes,
+    # we can use a fairly broad regex for matching attributes. Any strings or
+    # glimmer expressions should aleady have been matched before hitting that match
+    patterns:
+    - include: '#glimmer-unescaped-expression'
+    - include: '#glimmer-comment-block'
+    - include: '#glimmer-comment-inline'
+    - include: '#glimmer-expression'
+    - include: '#string-double-quoted-html'
+    - include: '#string-single-quoted-html'
+    - include: '#html-attribute'
+    - include: '#boolean'
+  # match html attributes and flags id as special attribute, eg: class=
+  html-attribute:
+    match: '\s\b(id)(=)|\s\b([a-zA-Z0-9:_.-]+)(=)?'
+    captures:
+      1: { name: entity.other.attribute-name.id.html.handlebars }
+      2: { name: punctuation.separator.key-value.html.handlebars }
+      3: { name: entity.other.attribute-name.handlebars }
+      4: { name: punctuation.separator.key-value.html.handlebars }
+    patterns: []
+  # EG: &amp;
+  entities:
+    patterns:
+    - name: constant.character.entity.html.handlebars
+      match: '(&)([a-zA-Z0-9]+|#[0-9]+|#x[0-9a-fA-F]+)(;)'
       captures:
-        0: { name: constant.language.handlebars }
-      patterns: []
-    # matches attention keywords, used in comments
-    attention:
-      name: storage.type.class.${1:/downcase}
-      match: "@?(TODO|FIXME|CHANGED|XXX|IDEA|HACK|NOTE|REVIEW|NB|BUG|QUESTION|TEMP)\\b"
-      patterns: []
-    #
-    # Handlebars/Glimmer Patterns
-    #
-    # Capture unescaped triple curlies
-    glimmer-unescaped-expression:
-      name: entity.unescaped.expression.handlebars
-      begin: '{{{'
-      end: '}}}'
-      captures:
-        0: { name: punctuation.definition.block.unescaped.handlebars }
-      patterns:
-        - { include: '#glimmer-subexp' }
-    glimmer-comment-block:
-      name: comment.block.glimmer
-      begin: '{{!--'
-      end: '--}}'
-      captures:
-        0: { name: punctuation.definition.block.comment.glimmer }
-      patterns:
-        - { include: '#attention' }
-    glimmer-comment-inline:
-      name: comment.inline.glimmer
-      begin: '{{!'
-      end: '}}'
-      captures:
-        0: { name: "punctuation.definition.block.comment.glimmer" }
-      patterns:
-        - { include: '#attention' }
-    glimmer-expression:
-      name: entity.expression.handlebars
-      begin: '({{)(#)*(\/)*(?:(if|unless|with|each-in|each|else if|else|eq|not-eq|and|or|xor|gt|gte|link-to|lt|lte|is-array|is-equal|action|component|concat|debugger| get|hash|loc|log|mount|mut|outlet|partial|query-params|render|unbound)(?!-)\b|([a-zA-Z0-9_/.-]+))'
-      end: '(}})'
-      captures:
-        1: { name: punctuation.definition.expression.handlebars }
-        2: { name: punctuation.definition.expression.handlebars }
-        3: { name: punctuation.definition.expression.handlebars }
-        4: { name: support.function.builtin }
-        5: { name: entity.name.function.expression.handlebars }
-      patterns:
-        - { include: '#as-keyword' }
-        - { include: '#as-params' }
-        - { include: '#glimmer-subexp' }
-        - { include: '#string-single-quoted' }
-        - { include: '#string-double-quoted' }
-        - { include: '#boolean' }
-        - { include: '#glimmer-parameter-name' }
-        - { include: '#glimmer-parameter-value' }
-    # matches any subexpressions within glimmer expressions:
-    # {{something someValue=(helper someProp)}}
-    glimmer-subexp:
-      name: entity.subexpression.handlebars
-      begin: '(\()([a-zA-Z0-9.-]+)'
-      end: '(\))'
-      captures:
-        1: { name: punctuation.definition.subexpression.handlebars }
-        2: { name: support.function.name.subexpression.handlebars }
-      patterns:
-        - { include: '#glimmer-subexp' }
-        - { include: '#string-single-quoted' }
-        - { include: '#string-double-quoted' }
-        - { include: '#boolean' }
-        - { include: '#glimmer-parameter-name' }
-        - { include: '#glimmer-parameter-value' }
-    # matches the 'as' when creating params: as |someParam|
-    as-keyword:
-      name: support.function.builtin.handlebars
-      match: '\s\b(as)\b(?=\s\|)'
-      patterns: []
-    # Matches the params inside pipes: as |someParam|
-    as-params:
-      name: keyword.block-params.handlebars
-      begin: '(?<!\|)(\|)'
-      beginCaptures:
-        1: { name: constant.other.symbol.begin.handlebars }
-      end: '(\|)(?!\|)'
-      endCaptures:
-        1: { name: constant.other.symbol.end.handlebars }
-      patterns:
-        - { include: '#variable' }
-    # The value in a handlebars assignment eg: name=VALUE
-    glimmer-parameter-value:
-      match: '\b([a-zA-Z09_.-]+)\b(?!=)'
-      captures:
-        1: { name: variable.parameter.value.handlebars }
-      patterns: []
-    # The name in a handlebars assignment, eg: NAME=value
-    glimmer-parameter-name:
-      match: '\b([a-zA-Z0-9:_.-]+)(=)'
-      captures:
-        1: { name: variable.parameter.name.handlebars }
-        2: { name: punctuation.definition.expression.handlebars }
-      patterns: []
-    variable:
-      name: variable.other.handlebars
-      match: '\b([a-zA-Z0-9-_]+)\b'
-      patterns: []
-    #
-    # HTML Patterns
-    #
-    # match on any html comment block eg: <!-- -->
-    html-comment:
-      name: comment.block.html.handlebars
-      begin: '<!--'
-      end: '--\s*>'
-      captures:
-        0: { name: punctuation.definition.comment.html.handlebars }
-      patterns:
-        - { include: '#attention' }
-        - match: --
-          name: invalid.illegal.bad-comments-or-CDATA.html.handlebars
-    # match any html tag, handle as separate matches on open/close tags
-    html-tag:
-      name: meta.tag.any.handlebars
-      begin: '(<\/?)(([a-zA-Z0-9:-]+))\b'
-      beginCaptures:
-        1: { name: punctuation.definition.tag.html.handlebars }
-        2: { name: entity.name.tag.html.handlebars }
-      end: '(\/?)(>)'
-      endCaptures:
-        1: { name: punctuation.definition.tag.html.handlebars }
-        2: { name: punctuation.definition.tag.html.handlebars }
-      # The order of includes is IMPORTANT. By including strings BEFORE attributes,
-      # we can use a fairly broad regex for matching attributes. Any strings or
-      # glimmer expressions should aleady have been matched before hitting that match
-      patterns:
-        - { include: '#glimmer-unescaped-expression' }
-        - { include: '#glimmer-comment-block' }
-        - { include: '#glimmer-comment-inline' }
-        - { include: '#glimmer-expression' }
-        - { include: '#string-double-quoted' }
-        - { include: '#string-single-quoted' }
-        - { include: '#html-attribute' }
-        - { include: '#boolean' }
-    # match html attributes and flags id as special attribute, eg: class=
-    html-attribute:
-      match: '\s\b(id)(=)|\s\b([a-zA-Z0-9:_.-]+)(=)?'
-      captures:
-        1: { name: entity.other.attribute-name.id.html.handlebars }
-        2: { name: punctuation.separator.key-value.html.handlebars }
-        3: { name: entity.other.attribute-name.handlebars }
-        4: { name: punctuation.separator.key-value.html.handlebars }
-      patterns: []
-    # EG: &amp;
-    entities:
-      patterns:
-        - name: constant.character.entity.html.handlebars
-          match: (&)([a-zA-Z0-9]+|#[0-9]+|#x[0-9a-fA-F]+)(;)
-          captures:
-            1: { name: punctuation.definition.entity.html.handlebars }
-            3: { name: punctuation.definition.entity.html.handlebars }
-        - name: invalid.illegal.bad-ampersand.html.handlebars
-          match: '&'
+        1: { name: punctuation.definition.entity.html.handlebars }
+        3: { name: punctuation.definition.entity.html.handlebars }
+    - name: invalid.illegal.bad-ampersand.html.handlebars
+      match: '&'

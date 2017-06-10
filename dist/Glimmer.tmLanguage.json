@@ -2,7 +2,6 @@
   "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
   "scopeName": "source.handlebars",
   "name": "Glimmer",
-  "scopeName": "source.handlebars",
   "fileTypes": [
     "hbs"
   ],
@@ -53,6 +52,51 @@
     },
     "string-single-quoted-handlebars": {
       "name": "string.quoted.single.handlebars",
+      "begin": "'",
+      "beginCaptures": {
+        "0": {
+          "name": "punctuation.definition.string.begin.handlebars"
+        }
+      },
+      "end": "'",
+      "endCaptures": {
+        "0": {
+          "name": "punctuation.definition.string.end.handlebars"
+        }
+      },
+      "patterns": [
+        {
+          "name": "constant.character.escape.handlebars",
+          "match": "\\\\'"
+        }
+      ]
+    },
+    "string-double-quoted-html": {
+      "name": "string.quoted.double.html.handlebars",
+      "begin": "\"",
+      "beginCaptures": {
+        "0": {
+          "name": "punctuation.definition.string.begin.handlebars"
+        }
+      },
+      "end": "\"",
+      "endCaptures": {
+        "0": {
+          "name": "punctuation.definition.string.end.handlebars"
+        }
+      },
+      "patterns": [
+        {
+          "name": "constant.character.escape.handlebars",
+          "match": "\\\\\""
+        },
+        {
+          "include": "#glimmer-expression"
+        }
+      ]
+    },
+    "string-single-quoted-html": {
+      "name": "string.quoted.single.html.handlebars",
       "begin": "'",
       "beginCaptures": {
         "0": {
@@ -142,7 +186,7 @@
     },
     "glimmer-expression": {
       "name": "entity.expression.handlebars",
-      "begin": "({{)(#)*(\\/)*(?:(if|unless|with|each-in|each|else if|else|eq|not-eq|and|or|xor|gt|gte|link-to|lt|lte|is-array|is-equal|action|component|concat|debugger| get|hash|loc|log|mount|mut|outlet|partial|query-params|render|unbound)(?!-)\\b|([a-zA-Z0-9_/.-]+))",
+      "begin": "({{)(#)*(/)*(?:(if|unless|with|each-in|each|else if|else|eq|not-eq|and|or|xor|gt|gte|link-to|lt|lte|is-array|is-equal|action|component|concat|debugger|get|hash|loc|log|mount|mut|outlet|partial|query-params|render|unbound)(?!-)\\b|([a-zA-Z0-9_/.-]+))",
       "end": "(}})",
       "captures": {
         "1": {
@@ -247,7 +291,7 @@
       ]
     },
     "glimmer-parameter-value": {
-      "match": "\\b([a-zA-Z09_.-]+)\\b(?!=)",
+      "match": "\\b([a-zA-Z0-9:_.-]+)\\b(?!=)",
       "captures": {
         "1": {
           "name": "variable.parameter.value.handlebars"
