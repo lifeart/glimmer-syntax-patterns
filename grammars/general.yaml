@@ -1,0 +1,26 @@
+# General purpose syntax patterns can be included in this file
+# NOTE: These patterns are first injected into the TypeScript base, if they have
+# a language scope it should be ts
+$schema: https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json
+patterns: []
+scopeName: source.general # For schema validation only
+repository:
+  # Attention keyword patterns to highlight
+  attention:
+    name: storage.type.class.${1:/downcase}
+    match: '@?(TODO|FIXME|CHANGED|XXX|IDEA|HACK|NOTE|REVIEW|NB|BUG|QUESTION|TEMP)\\b'
+    patterns: []
+  # Ember inline tagged template declaration of hbs``
+  glimmer-tagged-template:
+    name: meta.source.handlebars.ts
+    begin: '\s?(hbs)((`))' # Optional whitespace required for Babel to match pattern
+    beginCaptures:
+      1: { name: entity.name.tag.ts }
+      2: { name: markup.template.definition.begin.handlebars.ts }
+      3: { name: string.template.tagged.ts }
+    end: '((`))'
+    endCaptures:
+      1: { name: markup.template.definition.end.handlebars.ts }
+      2: { name: string.template.tagged.ts }
+    patterns:
+      - { include: source.handlebars }

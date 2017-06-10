@@ -1,8 +1,0 @@
-{
-  "repository": {
-    "attention": {
-      "name": "storage.type.class.${1:/downcase}",
-      "match": "@?(TODO|FIXME|CHANGED|XXX|IDEA|HACK|NOTE|REVIEW|NB|BUG|QUESTION|TEMP)\\b"
-    }
-  }
-}
