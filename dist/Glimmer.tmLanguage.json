@@ -129,6 +129,11 @@
       },
       "patterns": []
     },
+    "attention": {
+      "name": "storage.type.class.${1:/downcase}",
+      "match": "@?(TODO|FIXME|CHANGED|XXX|IDEA|HACK|NOTE|REVIEW|NB|BUG|QUESTION|TEMP)\\b",
+      "patterns": []
+    },
     "glimmer-unescaped-expression": {
       "comment": "Capture unescaped expressions of triple curlies",
       "name": "entity.unescaped.expression.handlebars",
@@ -161,7 +166,11 @@
           "name": "punctuation.definition.block.comment.glimmer"
         }
       },
-      "patterns": []
+      "patterns": [
+        {
+          "include": "#attention"
+        }
+      ]
     },
     "glimmer-comment-inline": {
       "name": "comment.inline.glimmer",
@@ -172,7 +181,11 @@
           "name": "punctuation.definition.block.comment.glimmer"
         }
       },
-      "patterns": []
+      "patterns": [
+        {
+          "include": "#attention"
+        }
+      ]
     },
     "glimmer-expression": {
       "name": "entity.expression.handlebars",
@@ -320,6 +333,9 @@
       "end": "--\\s*>",
       "name": "comment.block.html.handlebars",
       "patterns": [
+        {
+          "include": "#attention"
+        },
         {
           "match": "--",
           "name": "invalid.illegal.bad-comments-or-CDATA.html.handlebars"

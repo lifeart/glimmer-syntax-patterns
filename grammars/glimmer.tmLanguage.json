@@ -1,5 +1,6 @@
 {
 	"$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "scopeName": "source.handlebars",
 	"name": "Glimmer",
   "scopeName": "source.handlebars",
   "fileTypes": [
@@ -93,6 +94,11 @@
 			},
 			"patterns": []
 		},
+    "attention": {
+      "name": "storage.type.class.${1:/downcase}",
+      "match": "@?(TODO|FIXME|CHANGED|XXX|IDEA|HACK|NOTE|REVIEW|NB|BUG|QUESTION|TEMP)\\b",
+      "patterns": []
+    },
 
 
 
@@ -120,7 +126,9 @@
       "captures": {
         "0": { "name": "punctuation.definition.block.comment.glimmer" }
       },
-			"patterns": []
+			"patterns": [
+        { "include": "#attention" }
+      ]
     },
     "glimmer-comment-inline": {
       "name": "comment.inline.glimmer",
@@ -129,7 +137,9 @@
       "captures": {
         "0": { "name": "punctuation.definition.block.comment.glimmer" }
       },
-			"patterns": []
+			"patterns": [
+        { "include": "#attention" }
+      ]
     },
 		"glimmer-expression": {
       "name": "entity.expression.handlebars",
@@ -227,6 +237,7 @@
       "end": "--\\s*>",
       "name": "comment.block.html.handlebars",
       "patterns": [
+        { "include": "#attention" },
         {
           "match": "--",
           "name": "invalid.illegal.bad-comments-or-CDATA.html.handlebars"
