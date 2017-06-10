@@ -83,20 +83,15 @@ typeScriptBase.repository.comment.patterns[0].patterns = [
   { include: '#custom-tags' }
 ];
 
-// Inject General Patterns
-// Attention pattern highlights things like @TODO, Add it to each comment pattern
+// Inject General Patterns, currently includes attention highlighting keywords
+// pattern matches
 Object.assign(typeScriptBase.repository, generalPatterns.repository);
 
+// Add the #attention include to each comment pattern to highlight keywords like TODO
+// inside of comments
 typeScriptBase.repository.comment.patterns.forEach(pattern => {
-  // Handle the double slash pattern nested in another pattern without a name 😔
-  if (pattern.name) {
-    if (!pattern.patterns) { pattern.patterns = []; }
-    pattern.patterns.unshift({ include: '#attention' });
-  } else {
-    pattern = pattern.patterns[0];
-    if (!pattern.patterns) { pattern.patterns = []; }
-    pattern.patterns.unshift({ include: '#attention' });
-  }
+  if (!pattern.patterns) { pattern.patterns = []; }
+  pattern.patterns.unshift({ include: '#attention' });
 });
 
 // Fix tsx => ts
